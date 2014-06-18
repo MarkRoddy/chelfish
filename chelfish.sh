@@ -15,17 +15,23 @@ function install-if-missing () {
     if [ -z "$package" ]; then
 	package="$cmd";
     fi
-    RELEASE=`lsb_release --id --short`
+    if [ -d /etc/yum ]; then
+        RELEASE="RHEL";
+    else
+        RELEASE=`lsb_release --id --short`
+    fi
     if ! which $cmd &> /dev/null; then
-	if [ "Ubuntu" == "$RELEASE" ]; then
+	    if [ "Ubuntu" == "$RELEASE" ]; then
             echo -n "Installing $cmd... ";
             sudo apt-get install "$package" --assume-yes > /dev/null
             echo "done";
-	else
+        elif [ "RHEL" == "$RELEASE" ]; then
+            sudo yum install "$package" --assumeyes > /dev/null
+	    else
             # Feel free to add your OS above
             echo "please install $cmd before continuing";
             exit 1;
-	fi
+	    fi
     fi
 }
     
